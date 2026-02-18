@@ -1,70 +1,257 @@
-# Getting Started with Create React App
+# serve-static
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
+[![Linux Build][github-actions-ci-image]][github-actions-ci-url]
+[![Windows Build][appveyor-image]][appveyor-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
 
-## Available Scripts
+## Install
 
-In the project directory, you can run:
+This is a [Node.js](https://nodejs.org/en/) module available through the
+[npm registry](https://www.npmjs.com/). Installation is done using the
+[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
-### `npm start`
+```sh
+$ npm install serve-static
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## API
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```js
+var serveStatic = require('serve-static')
+```
 
-### `npm test`
+### serveStatic(root, options)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Create a new middleware function to serve files from within a given root
+directory. The file to serve will be determined by combining `req.url`
+with the provided root directory. When a file is not found, instead of
+sending a 404 response, this module will instead call `next()` to move on
+to the next middleware, allowing for stacking and fall-backs.
 
-### `npm run build`
+#### Options
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+##### acceptRanges
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Enable or disable accepting ranged requests, defaults to true.
+Disabling this will not send `Accept-Ranges` and ignore the contents
+of the `Range` request header.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+##### cacheControl
 
-### `npm run eject`
+Enable or disable setting `Cache-Control` response header, defaults to
+true. Disabling this will ignore the `immutable` and `maxAge` options.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+##### dotfiles
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+ Set how "dotfiles" are treated when encountered. A dotfile is a file
+or directory that begins with a dot ("."). Note this check is done on
+the path itself without checking if the path actually exists on the
+disk. If `root` is specified, only the dotfiles above the root are
+checked (i.e. the root itself can be within a dotfile when set
+to "deny").
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  - `'allow'` No special treatment for dotfiles.
+  - `'deny'` Deny a request for a dotfile and 403/`next()`.
+  - `'ignore'` Pretend like the dotfile does not exist and 404/`next()`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The default value is similar to `'ignore'`, with the exception that this
+default will not ignore the files within a directory that begins with a dot.
 
-## Learn More
+##### etag
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Enable or disable etag generation, defaults to true.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+##### extensions
 
-### Code Splitting
+Set file extension fallbacks. When set, if a file is not found, the given
+extensions will be added to the file name and search for. The first that
+exists will be served. Example: `['html', 'htm']`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The default value is `false`.
 
-### Analyzing the Bundle Size
+##### fallthrough
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Set the middleware to have client errors fall-through as just unhandled
+requests, otherwise forward a client error. The difference is that client
+errors like a bad request or a request to a non-existent file will cause
+this middleware to simply `next()` to your next middleware when this value
+is `true`. When this value is `false`, these errors (even 404s), will invoke
+`next(err)`.
 
-### Making a Progressive Web App
+Typically `true` is desired such that multiple physical directories can be
+mapped to the same web address or for routes to fill in non-existent files.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+The value `false` can be used if this middleware is mounted at a path that
+is designed to be strictly a single file system directory, which allows for
+short-circuiting 404s for less overhead. This middleware will also reply to
+all methods.
 
-### Advanced Configuration
+The default value is `true`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+##### immutable
 
-### Deployment
+Enable or disable the `immutable` directive in the `Cache-Control` response
+header, defaults to `false`. If set to `true`, the `maxAge` option should
+also be specified to enable caching. The `immutable` directive will prevent
+supported clients from making conditional requests during the life of the
+`maxAge` option to check if the file has changed.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+##### index
 
-### `npm run build` fails to minify
+By default this module will send "index.html" files in response to a request
+on a directory. To disable this set `false` or to supply a new index pass a
+string or an array in preferred order.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+##### lastModified
+
+Enable or disable `Last-Modified` header, defaults to true. Uses the file
+system's last modified value.
+
+##### maxAge
+
+Provide a max-age in milliseconds for http caching, defaults to 0. This
+can also be a string accepted by the [ms](https://www.npmjs.org/package/ms#readme)
+module.
+
+##### redirect
+
+Redirect to trailing "/" when the pathname is a dir. Defaults to `true`.
+
+##### setHeaders
+
+Function to set custom headers on response. Alterations to the headers need to
+occur synchronously. The function is called as `fn(res, path, stat)`, where
+the arguments are:
+
+  - `res` the response object
+  - `path` the file path that is being sent
+  - `stat` the stat object of the file that is being sent
+
+## Examples
+
+### Serve files with vanilla node.js http server
+
+```js
+var finalhandler = require('finalhandler')
+var http = require('http')
+var serveStatic = require('serve-static')
+
+// Serve up public/ftp folder
+var serve = serveStatic('public/ftp', { index: ['index.html', 'index.htm'] })
+
+// Create server
+var server = http.createServer(function onRequest (req, res) {
+  serve(req, res, finalhandler(req, res))
+})
+
+// Listen
+server.listen(3000)
+```
+
+### Serve all files as downloads
+
+```js
+var contentDisposition = require('content-disposition')
+var finalhandler = require('finalhandler')
+var http = require('http')
+var serveStatic = require('serve-static')
+
+// Serve up public/ftp folder
+var serve = serveStatic('public/ftp', {
+  index: false,
+  setHeaders: setHeaders
+})
+
+// Set header to force download
+function setHeaders (res, path) {
+  res.setHeader('Content-Disposition', contentDisposition(path))
+}
+
+// Create server
+var server = http.createServer(function onRequest (req, res) {
+  serve(req, res, finalhandler(req, res))
+})
+
+// Listen
+server.listen(3000)
+```
+
+### Serving using express
+
+#### Simple
+
+This is a simple example of using Express.
+
+```js
+var express = require('express')
+var serveStatic = require('serve-static')
+
+var app = express()
+
+app.use(serveStatic('public/ftp', { index: ['default.html', 'default.htm'] }))
+app.listen(3000)
+```
+
+#### Multiple roots
+
+This example shows a simple way to search through multiple directories.
+Files are searched for in `public-optimized/` first, then `public/` second
+as a fallback.
+
+```js
+var express = require('express')
+var path = require('path')
+var serveStatic = require('serve-static')
+
+var app = express()
+
+app.use(serveStatic(path.join(__dirname, 'public-optimized')))
+app.use(serveStatic(path.join(__dirname, 'public')))
+app.listen(3000)
+```
+
+#### Different settings for paths
+
+This example shows how to set a different max age depending on the served
+file type. In this example, HTML files are not cached, while everything else
+is for 1 day.
+
+```js
+var express = require('express')
+var path = require('path')
+var serveStatic = require('serve-static')
+
+var app = express()
+
+app.use(serveStatic(path.join(__dirname, 'public'), {
+  maxAge: '1d',
+  setHeaders: setCustomCacheControl
+}))
+
+app.listen(3000)
+
+function setCustomCacheControl (res, path) {
+  if (serveStatic.mime.lookup(path) === 'text/html') {
+    // Custom Cache-Control for HTML files
+    res.setHeader('Cache-Control', 'public, max-age=0')
+  }
+}
+```
+
+## License
+
+[MIT](LICENSE)
+
+[appveyor-image]: https://badgen.net/appveyor/ci/dougwilson/serve-static/master?label=windows
+[appveyor-url]: https://ci.appveyor.com/project/dougwilson/serve-static
+[coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/serve-static/master
+[coveralls-url]: https://coveralls.io/r/expressjs/serve-static?branch=master
+[github-actions-ci-image]: https://badgen.net/github/checks/expressjs/serve-static/master?label=linux
+[github-actions-ci-url]: https://github.com/expressjs/serve-static/actions/workflows/ci.yml
+[node-image]: https://badgen.net/npm/node/serve-static
+[node-url]: https://nodejs.org/en/download/
+[npm-downloads-image]: https://badgen.net/npm/dm/serve-static
+[npm-url]: https://npmjs.org/package/serve-static
+[npm-version-image]: https://badgen.net/npm/v/serve-static
