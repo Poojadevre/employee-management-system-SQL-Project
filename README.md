@@ -1,51 +1,70 @@
-# A CRUD based Employee-Management-System using ReactJS, NodeJS, ExpressJS and MySQL
+# Getting Started with Create React App
 
-- <h2>Prerequisites</h2>
-  Make sure you have the following installed: <br>
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-  - Node.js (v14.0.0 or higher)
+## Available Scripts
 
-  - React (v16.8.0 or higher)
+In the project directory, you can run:
 
-  - MySQL (v5.7 or higher)<br><br>
+### `npm start`
 
-  Clone the repository:
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-   ```bash
-   git clone https://github.com/your-username/simple-crud.git
-   cd simple-crud
- - <h2>About</h2>
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-    This is a simple CRUD app using ReactJS, NodeJS, ExpressJS and MySQL. <br>
-    As this was my learning project I have used MySQL as the Database due to familiarity with this DB more over I have used NodeJS as the backend server.
+### `npm test`
 
- - <h2>Implementation</h2>
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-   1) If you want to run this application on your machine, you need to have ReactJS, NodeJS and MySQL installed on your PC. <br>
+### `npm run build`
 
-   2) After Installing MySQL client and NodeJS, you need to create a database named "db_name" and create a table named "db_name_table" on it. <br>
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-   3) Then insert some required data like "name", "email", "position" etc (things you want to store in the db via clientSide) in the table. <br>
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-   4) Make sure to change the "db_name" and "db_name_table" in the "index.js" file. <br>
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### `npm run eject`
 
-   ```node
-    const db = mysql.createConnection({ 
-    user: 'root',
-    host: 'localhost',
-    password: 'password',
-    database: 'DB_NAME',
-    }); 
-    ```
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-   5) Install the required dependencies by running `npm install` command. <br>
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-   6) Run the server by running `npm start/yarn start` command. <br>
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-- ### Demo Video
-  https://www.loom.com/share/17bae782b09844c197df971b717e5303?sid=b55aa837-852c-449c-8d78-633df4d1d02d
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-- MySQL DB Snippets
-  ![image](https://github.com/abhinav0git/simple-crud/assets/103176039/e2d89481-42c4-437e-82e4-071a773de0e3)
+## Learn More
 
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
