@@ -1,51 +1,32 @@
-/**
- * Module dependencies.
+/*!
+ * toidentifier
+ * Copyright(c) 2016 Douglas Christopher Wilson
+ * MIT Licensed
  */
 
-var crypto = require('crypto');
+'use strict'
 
 /**
- * Sign the given `val` with `secret`.
+ * Module exports.
+ * @public
+ */
+
+module.exports = toIdentifier
+
+/**
+ * Trasform the given string into a JavaScript identifier
  *
- * @param {String} val
- * @param {String} secret
- * @return {String}
- * @api private
+ * @param {string} str
+ * @returns {string}
+ * @public
  */
 
-exports.sign = function(val, secret){
-  if ('string' != typeof val) throw new TypeError("Cookie value must be provided as a string.");
-  if ('string' != typeof secret) throw new TypeError("Secret string must be provided.");
-  return val + '.' + crypto
-    .createHmac('sha256', secret)
-    .update(val)
-    .digest('base64')
-    .replace(/\=+$/, '');
-};
-
-/**
- * Unsign and decode the given `val` with `secret`,
- * returning `false` if the signature is invalid.
- *
- * @param {String} val
- * @param {String} secret
- * @return {String|Boolean}
- * @api private
- */
-
-exports.unsign = function(val, secret){
-  if ('string' != typeof val) throw new TypeError("Signed cookie string must be provided.");
-  if ('string' != typeof secret) throw new TypeError("Secret string must be provided.");
-  var str = val.slice(0, val.lastIndexOf('.'))
-    , mac = exports.sign(str, secret);
-  
-  return sha1(mac) == sha1(val) ? str : false;
-};
-
-/**
- * Private
- */
-
-function sha1(str){
-  return crypto.createHash('sha1').update(str).digest('hex');
+function toIdentifier (str) {
+  return str
+    .split(' ')
+    .map(function (token) {
+      return token.slice(0, 1).toUpperCase() + token.slice(1)
+    })
+    .join('')
+    .replace(/[^ _0-9a-z]/gi, '')
 }
