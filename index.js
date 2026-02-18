@@ -1,62 +1,51 @@
-/* eslint-disable node/no-deprecated-api */
-var buffer = require('buffer')
-var Buffer = buffer.Buffer
+/**
+ * Module dependencies.
+ */
 
-// alternative to using Object.keys for old browsers
-function copyProps (src, dst) {
-  for (var key in src) {
-    dst[key] = src[key]
-  }
-}
-if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer
-} else {
-  // Copy properties from require('buffer')
-  copyProps(buffer, exports)
-  exports.Buffer = SafeBuffer
-}
+var crypto = require('crypto');
 
-function SafeBuffer (arg, encodingOrOffset, length) {
-  return Buffer(arg, encodingOrOffset, length)
-}
+/**
+ * Sign the given `val` with `secret`.
+ *
+ * @param {String} val
+ * @param {String} secret
+ * @return {String}
+ * @api private
+ */
 
-// Copy static methods from Buffer
-copyProps(Buffer, SafeBuffer)
+exports.sign = function(val, secret){
+  if ('string' != typeof val) throw new TypeError("Cookie value must be provided as a string.");
+  if ('string' != typeof secret) throw new TypeError("Secret string must be provided.");
+  return val + '.' + crypto
+    .createHmac('sha256', secret)
+    .update(val)
+    .digest('base64')
+    .replace(/\=+$/, '');
+};
 
-SafeBuffer.from = function (arg, encodingOrOffset, length) {
-  if (typeof arg === 'number') {
-    throw new TypeError('Argument must not be a number')
-  }
-  return Buffer(arg, encodingOrOffset, length)
-}
+/**
+ * Unsign and decode the given `val` with `secret`,
+ * returning `false` if the signature is invalid.
+ *
+ * @param {String} val
+ * @param {String} secret
+ * @return {String|Boolean}
+ * @api private
+ */
 
-SafeBuffer.alloc = function (size, fill, encoding) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  var buf = Buffer(size)
-  if (fill !== undefined) {
-    if (typeof encoding === 'string') {
-      buf.fill(fill, encoding)
-    } else {
-      buf.fill(fill)
-    }
-  } else {
-    buf.fill(0)
-  }
-  return buf
-}
+exports.unsign = function(val, secret){
+  if ('string' != typeof val) throw new TypeError("Signed cookie string must be provided.");
+  if ('string' != typeof secret) throw new TypeError("Secret string must be provided.");
+  var str = val.slice(0, val.lastIndexOf('.'))
+    , mac = exports.sign(str, secret);
+  
+  return sha1(mac) == sha1(val) ? str : false;
+};
 
-SafeBuffer.allocUnsafe = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return Buffer(size)
-}
+/**
+ * Private
+ */
 
-SafeBuffer.allocUnsafeSlow = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return buffer.SlowBuffer(size)
+function sha1(str){
+  return crypto.createHash('sha1').update(str).digest('hex');
 }
